@@ -1,0 +1,19 @@
+{
+  "name": "s1-reaction",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@cloudflare/itty-router-openapi": "^1.1.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240502.0",
+    "@types/node": "^20.12.8",
+    "@types/service-worker-mock": "^2.0.4",
+    "wrangler": "^3.53.1"
+  }
+}
