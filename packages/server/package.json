@@ -1,0 +1,27 @@
+{
+  "name": "s1-reaction-server",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev-deploy-db": "wrangler d1 execute s1-reaction --local --file=./schema.sql",
+    "cf-typegen": "wrangler types",
+    "login": "wrangler login",
+    "put-secret:SECRET_KEY": "wrangler secret put SECRET_KEY",
+    "put-secret:ADMIN_UID_LIST": "wrangler secret put ADMIN_UID_LIST",
+    "deploy": "wrangler deploy",
+    "deploy-db": "wrangler d1 execute s1-reaction --remote --file=./schema.sql"
+  },
+  "dependencies": {
+    "@cloudflare/itty-router-openapi": "^1.1.1",
+    "itty-router": "^5.0.17",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240512.0",
+    "@types/node": "^20.12.12",
+    "@types/service-worker-mock": "^2.0.4",
+    "shared": "workspace:*",
+    "wrangler": "^3.56.0"
+  }
+}

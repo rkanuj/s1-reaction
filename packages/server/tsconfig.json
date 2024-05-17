@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": "src",
+    "paths": {
+      "@/*": [
+        "*"
+      ]
+    },
+    "types": [
+      "@types/node",
+      "@types/service-worker-mock",
+      "@cloudflare/workers-types/2023-07-01"
+    ]
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+    "worker-configuration.d.ts"
+  ]
+}
