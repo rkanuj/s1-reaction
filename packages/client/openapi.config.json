@@ -1,0 +1,4 @@
+{
+  "inputSpec": "http://localhost:8787/openapi.json",
+  "generatorName": "typescript-fetch"
+}

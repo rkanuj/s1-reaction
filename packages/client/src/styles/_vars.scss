@@ -1,0 +1,10 @@
+$border-dashed: 1px dashed #022c80;
+
+@mixin clear-btn {
+  padding: 0;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 12px;
+  font-family: sans-serif;
+}
