@@ -1,15 +1,22 @@
 name: Cloudflare Deploy
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - "server=v*.*.*"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy
     steps:
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
       - uses: actions/checkout@v4
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          packageManager: pnpm
+          workingDirectory: "packages/server"
