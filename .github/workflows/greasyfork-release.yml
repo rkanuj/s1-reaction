@@ -8,6 +8,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     name: Release
     steps:
       - uses: pnpm/action-setup@v4
@@ -25,5 +27,6 @@ jobs:
         with:
           name: "GreasyFork script release: ${{ env.RELEASE_VERSION }}"
           body_path: ./packages/client/release-path.txt
+          generate_release_notes: true
           files: |
             ./packages/client/dist/s1-reaction.user.js
