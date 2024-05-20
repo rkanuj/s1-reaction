@@ -17,7 +17,7 @@ mode = "smart"
 # Note: Use secrets to store sensitive data.
 # - https://developers.cloudflare.com/workers/configuration/secrets/
 [vars]
-APP_VERSION = "0.0.1"
+APP_VERSION = "0.1.0"
 S1_APP_API_URL = "https://app.saraba1st.com/2b/api/app"
 
 # Bind the Workers AI model catalog. Run machine learning models, powered by serverless GPUs, on Cloudflare’s global network
