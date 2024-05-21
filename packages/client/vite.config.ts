@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
       monkey({
         entry: 'src/main.ts',
         userscript: {
-          name: 'S1 Reaction 帖子回应服务',
+          name: `S1 Reaction 帖子回应服务${ env.VITE_OFFLINE ? '（离线版）' : '' }`,
           namespace: 'https://github.com/rkanuj/s1-reaction',
           version: dev ? 'Latest' : version,
           author: 'rkanuj',
