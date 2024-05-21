@@ -42,10 +42,13 @@ export default defineConfig(({ mode }) => {
           ],
         },
         build: {
-          fileName: 's1-reaction.user.js',
+          fileName: !env.VITE_OFFLINE ? 's1-reaction.user.js' : 's1-reaction-offline.user.js',
         },
       }),
     ],
+    build: {
+      emptyOutDir: false,
+    },
     resolve: {
       alias: {
         '@': '/src',

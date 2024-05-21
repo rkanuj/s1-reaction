@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_S1_APP_API_URL: string;
   readonly VITE_S1_STATIC_IMAGE_URL: string;
   readonly VITE_SKIP_S1: string;
+  readonly VITE_OFFLINE: string;
 }
 
 interface ImportMeta {
