@@ -1,5 +1,5 @@
-import { s1Api } from '@/api';
-import type { GetSmiles200Response } from '@/api/S1Api';
+import API from '@/api';
+import type { GetSmiles200Response } from '@/api/S1ApiOffline';
 import { smilesList } from '@/store';
 import { justAlert, justLogError } from '@/utils';
 import { responseErrorHandle } from 'shared';
@@ -48,7 +48,8 @@ export async function checkSmiles() {
     }
   }
 
-  const response = await s1Api.getSmiles().catch(responseErrorHandle<GetSmiles200Response>);
+  const response = await (import.meta.env.VITE_OFFLINE ? API.s1ApiOffline : API.s1Api)
+    .getSmiles().catch(responseErrorHandle<GetSmiles200Response>);
   if (!response.success) {
     justAlert('通过 S1 接口获取麻将脸表情列表失败');
     if (response.message) {

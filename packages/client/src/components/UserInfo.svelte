@@ -3,6 +3,10 @@
   import { currentTimestamp, deepCopy, formatTimestamp } from 'shared';
 
   const onRemoveBtnClick = (uid: number) => {
+    if (import.meta.env.VITE_OFFLINE) {
+      return;
+    }
+
     userInfoDict.update(dict => {
       const newDict = deepCopy(dict);
       delete newDict[uid];
@@ -15,32 +19,34 @@
   };
 </script>
 
-<div class="user-info">
-  {#each $userInfoList as userInfo}
-    <div class="user">
-      <div>
-        {#if $userInfoList.length > 1}
-          <input type="radio" bind:group={$selectedUID} value={userInfo.uid}/>
-        {/if}
-        <span>{userInfo.username} (UID: {userInfo.uid})</span>
-        <button class="remove-user-btn" on:click={() => {onRemoveBtnClick(userInfo.uid)}}>×</button>
-      </div>
-      <div>
-        <code class="token">{userInfo.auth.token.substring(0, 7)}</code> |
-        <div class="date">
-          <span>{formatTimestamp(userInfo.auth.payload.iat, true)}</span>
-          {#if userInfo.auth.payload.exp > 0}
-            {@const expiredAt = userInfo.auth.payload.iat + userInfo.auth.payload.exp}
-            | <span class:expired={currentTimestamp() > expiredAt}>{formatTimestamp(expiredAt, true)}</span>
+{#if !import.meta.env.VITE_OFFLINE}
+  <div class="user-info">
+    {#each $userInfoList as userInfo}
+      <div class="user">
+        <div>
+          {#if $userInfoList.length > 1}
+            <input type="radio" bind:group={$selectedUID} value={userInfo.uid}/>
           {/if}
+          <span>{userInfo.username} (UID: {userInfo.uid})</span>
+          <button class="remove-user-btn" on:click={() => {onRemoveBtnClick(userInfo.uid)}}>×</button>
+        </div>
+        <div>
+          <code class="token">{userInfo.auth.token.substring(0, 7)}</code> |
+          <div class="date">
+            <span>{formatTimestamp(userInfo.auth.payload.iat, true)}</span>
+            {#if userInfo.auth.payload.exp > 0}
+              {@const expiredAt = userInfo.auth.payload.iat + userInfo.auth.payload.exp}
+              | <span class:expired={currentTimestamp() > expiredAt}>{formatTimestamp(expiredAt, true)}</span>
+            {/if}
+          </div>
         </div>
       </div>
-    </div>
-  {/each}
-  {#if $userInfoList.length > 1}
-    <span class="tips">切换账号后建议手动刷新页面</span>
-  {/if}
-</div>
+    {/each}
+    {#if $userInfoList.length > 1}
+      <span class="tips">切换账号后建议手动刷新页面</span>
+    {/if}
+  </div>
+{/if}
 
 <style lang="scss">
   @use "../styles/vars";

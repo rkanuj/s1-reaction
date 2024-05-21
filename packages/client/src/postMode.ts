@@ -1,8 +1,8 @@
-import { reactApi } from '@/api';
+import API from '@/api';
 import type { PostQueryPostReacts200Response } from '@/api/gen';
 import Modal from '@/components/Modal.svelte';
 import PostReacts from '@/components/PostReacts.svelte';
-import { reactsDict, selectedUserInfo } from '@/store';
+import { reactsDict, reactsOfflineDict, selectedUserInfo } from '@/store';
 import { extractId, justAlert, justLogError } from '@/utils';
 import { responseErrorHandle } from 'shared';
 import { get } from 'svelte/store';
@@ -10,7 +10,7 @@ import { get } from 'svelte/store';
 export async function postMode() {
   const postDataList: {
     pid: number,
-    uid: number,
+    uid2: number,
     target: HTMLElement
   }[] = [];
 
@@ -25,8 +25,8 @@ export async function postMode() {
     if (!userLinkElement) {
       return;
     }
-    const uid = extractId(userLinkElement.getAttribute('href') || '', /^space-uid-(\d+)\.html$/);
-    if (uid === null) {
+    const uid2 = extractId(userLinkElement.getAttribute('href') || '', /^space-uid-(\d+)\.html$/);
+    if (uid2 === null) {
       return;
     }
 
@@ -55,7 +55,7 @@ export async function postMode() {
 
     postDataList.push({
       pid,
-      uid,
+      uid2,
       target: mountElement,
     });
   });
@@ -69,7 +69,7 @@ export async function postMode() {
       target: data.target,
       props: {
         pid: data.pid,
-        uid: data.uid,
+        uid2: data.uid2,
       },
     });
   });
@@ -77,7 +77,21 @@ export async function postMode() {
     target: document.body,
   });
 
-  const response = await reactApi.postQueryPostReacts({
+  if (import.meta.env.VITE_OFFLINE) {
+    const result = API.reactApiOffline.postQueryPostReacts({
+      pids: postDataList.map(item => item.pid),
+    });
+
+    const dict: Record<string, ReactionOffline[]> = {};
+    result.forEach(item => {
+      dict[`pid${ item.pid }`] = [item.react];
+    });
+    reactsOfflineDict.set(dict);
+
+    return;
+  }
+
+  const response = await API.reactApi.postQueryPostReacts({
     postQueryPostReactsRequest: {
       pids: postDataList.map(item => item.pid),
       auth: get(selectedUserInfo)?.auth,
@@ -93,8 +107,8 @@ export async function postMode() {
   }
 
   const dict: Record<string, Reaction[]> = {};
-  response.result.forEach(result => {
-    dict[`pid${ result.pid }`] = result.reacts.map(react => {
+  response.result.forEach(item => {
+    dict[`pid${ item.pid }`] = item.reacts.map(react => {
       return {
         smiley: react.smiley,
         count: react.count,

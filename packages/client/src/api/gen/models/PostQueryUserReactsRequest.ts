@@ -24,14 +24,14 @@ export interface PostQueryUserReactsRequest {
      * @type {number}
      * @memberof PostQueryUserReactsRequest
      */
-    uid: number;
+    uid2: number;
 }
 
 /**
  * Check if a given object implements the PostQueryUserReactsRequest interface.
  */
 export function instanceOfPostQueryUserReactsRequest(value: object): boolean {
-    if (!('uid' in value)) return false;
+    if (!('uid2' in value)) return false;
     return true;
 }
 
@@ -45,7 +45,7 @@ export function PostQueryUserReactsRequestFromJSONTyped(json: any, ignoreDiscrim
     }
     return {
         
-        'uid': json['uid'],
+        'uid2': json['uid2'],
     };
 }
 
@@ -55,7 +55,7 @@ export function PostQueryUserReactsRequestToJSON(value?: PostQueryUserReactsRequ
     }
     return {
         
-        'uid': value['uid'],
+        'uid2': value['uid2'],
     };
 }
 

@@ -8,12 +8,16 @@
 
 <div class="modal">
   <ModalDialog>
-    {#if !$needLogin}
+    {#if import.meta.env.VITE_OFFLINE}
       <Smiles/>
-    {/if}
-    <Login/>
-    {#if !$needLogin}
-      <UserInfo/>
+    {:else}
+      {#if !$needLogin}
+        <Smiles/>
+      {/if}
+      <Login/>
+      {#if !$needLogin}
+        <UserInfo/>
+      {/if}
     {/if}
   </ModalDialog>
 </div>

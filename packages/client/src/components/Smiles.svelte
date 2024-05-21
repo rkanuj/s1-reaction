@@ -1,27 +1,39 @@
 <script lang="ts">
-  import { reactApiUpdatePostReact } from '@/api';
+  import { reactApiOfflineUpdatePostReacts, reactApiUpdatePostReact } from '@/api';
   import { selectedPost, selectedUserInfo, showModal, smilesTable } from '@/store';
   import { justAlert } from '@/utils';
 
   let activeTypeId = $smilesTable.length > 0 ? $smilesTable[0].typeid : null;
+  let remark = '';
 
   const onSmileyClick = async (smiley: string) => {
-    if (!$selectedUserInfo) {
-      justAlert('请先选择账号');
-      return;
-    }
     if (!$selectedPost) {
       justAlert('请先选择帖子');
       return;
     }
-    const result = await reactApiUpdatePostReact($selectedPost, smiley, $selectedUserInfo);
+
+    const result = await (async () => {
+      if (import.meta.env.VITE_OFFLINE) {
+        return reactApiOfflineUpdatePostReacts($selectedPost, smiley, remark);
+      }
+      if (!$selectedUserInfo) {
+        justAlert('请先选择账号');
+        return false;
+      }
+      return await reactApiUpdatePostReact($selectedPost, smiley, $selectedUserInfo);
+    })();
+
     if (result) {
       $showModal = false;
+      remark = '';
     }
   };
 </script>
 
 <div class="smiles">
+  {#if import.meta.env.VITE_OFFLINE}
+    <input bind:value={remark} class="remark" placeholder="输入可选文本标记，然后点击表情一起保存" type="text"/>
+  {/if}
   <div>
     {#each $smilesTable as smiles (smiles.typeid)}
       <button
@@ -56,6 +68,11 @@
   @use "../styles/vars";
 
   .smiles {
+    .remark {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
     .smiles-type-btn {
       @include vars.clear-btn;
       padding: 4px;
@@ -75,7 +92,7 @@
     .smiles-table {
       overflow: auto;
       width: 440px;
-      height: 36px * 5;
+      height: 40px * 5;
       border: vars.$border-dashed;
 
       td {

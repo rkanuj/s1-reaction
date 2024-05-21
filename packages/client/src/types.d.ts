@@ -4,6 +4,13 @@ type Reaction = {
   reacted?: boolean;
 }
 
+type ReactionOffline = {
+  smiley: string;
+  remark: string;
+  pid: number;
+  uid2: number;
+}
+
 type SmilesData = {
   typeid: number;
   type: string;
@@ -28,4 +35,12 @@ type UserInfo = {
   uid: number;
   username: string;
   auth: UserAuth;
+}
+
+type ReactListOfflineItem = {
+  pid: number;
+  uid2: number;
+  smiley: string;
+  remark: string;
+  created_at: string;
 }

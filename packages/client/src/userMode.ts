@@ -1,13 +1,13 @@
-import { reactApi } from '@/api';
+import API from '@/api';
 import type { PostQueryUserReacts200Response } from '@/api/gen';
 import UserReacts from '@/components/UserReacts.svelte';
-import { reactsDict } from '@/store';
+import { reactsDict, reactsOfflineDict } from '@/store';
 import { extractId, justAlert, justLogError } from '@/utils';
 import { responseErrorHandle } from 'shared';
 
 export async function userMode() {
-  const uid = extractId(location.href, /\/space-uid-(\d+)\.html$/);
-  if (uid === null) {
+  const uid2 = extractId(location.href, /\/space-uid-(\d+)\.html$/);
+  if (uid2 === null) {
     return;
   }
 
@@ -19,7 +19,7 @@ export async function userMode() {
   const mountElement = document.createElement('div');
   mountElement.classList.add('s1-reaction');
   mountElement.classList.add('s1-reaction-user');
-  mountElement.setAttribute('data-id', String(uid));
+  mountElement.setAttribute('data-id', String(uid2));
 
   positionElement.parentElement!.append(mountElement);
 
@@ -27,9 +27,19 @@ export async function userMode() {
     target: mountElement,
   });
 
-  const response = await reactApi.postQueryUserReacts({
+  if (import.meta.env.VITE_OFFLINE) {
+    const result = API.reactApiOffline.postQueryUserReacts({
+      uid2,
+    });
+    reactsOfflineDict.set({
+      received: result,
+    });
+    return;
+  }
+
+  const response = await API.reactApi.postQueryUserReacts({
     postQueryUserReactsRequest: {
-      uid,
+      uid2,
     },
   }).catch(responseErrorHandle<PostQueryUserReacts200Response>);
 
@@ -41,9 +51,8 @@ export async function userMode() {
     return;
   }
 
-  const dict = {
+  reactsDict.set({
     sent: response.result.sent,
     received: response.result.received,
-  };
-  reactsDict.set(dict);
+  });
 }

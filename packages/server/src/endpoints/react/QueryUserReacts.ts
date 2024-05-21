@@ -4,7 +4,7 @@ import { OpenAPIRoute, type OpenAPIRouteSchema } from '@cloudflare/itty-router-o
 import { z } from 'zod';
 
 const requestBody = z.object({
-  uid: uidSchema
+  uid2: uidSchema
     .describe('User ID to query'),
 });
 type RequestBody = z.infer<typeof requestBody>;
@@ -20,9 +20,9 @@ type ResponseResult = z.infer<typeof responseResult>;
 export default class QueryUserReacts extends OpenAPIRoute {
   async handle(_request: Request, _ctx: ExecutionContext,
                data: RequestData<RequestBody>): Promise<ResponseData<ResponseResult>> {
-    const { uid } = data.body;
+    const { uid2 } = data.body;
 
-    const result = await queryUserReacts(uid);
+    const result = await queryUserReacts(uid2);
 
     return {
       success: true,

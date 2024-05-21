@@ -27,6 +27,14 @@ export class LocalStorage {
     return this.getItem<SmilesData[]>('smiles');
   }
 
+  static setReactList(value: ReactListOfflineItem[]) {
+    this.setItem('reacts', value);
+  }
+
+  static getReactList() {
+    return this.getItem<ReactListOfflineItem[]>('reacts');
+  }
+
   private static setItem<T>(key: string, value: T) {
     localStorage.setItem(`${ this.prefix }.${ key }`, JSON.stringify(value));
   }
@@ -74,6 +82,7 @@ export const selectedUserInfo = readable<UserInfo | null>(null, set => {
 });
 
 export const reactsDict = writable<Record<string, Reaction[]>>({});
+export const reactsOfflineDict = writable<Record<string, ReactionOffline[]>>({});
 
 export const smilesList = writable<SmilesData[]>(LocalStorage.getSmilesList() || []);
 smilesList.subscribe(value => {
@@ -119,5 +128,5 @@ export const smileyDict = readable<Record<string, string>>({}, set => {
 export const showModal = writable(false);
 export const selectedPost = writable<{
   pid: number,
-  uid: number
+  uid2: number
 } | null>(null);

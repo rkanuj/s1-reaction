@@ -28,7 +28,7 @@ import { generateTestReacts } from '@/utils';
       target: targetPost,
       props: {
         pid: testPID,
-        uid: testUID,
+        uid2: testUID,
       },
     });
     new Modal({

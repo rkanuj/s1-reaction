@@ -1,15 +1,16 @@
 <script lang="ts">
-  import { reactApiUpdatePostReact } from '@/api';
+  import { reactApiOfflineUpdatePostReacts, reactApiUpdatePostReact } from '@/api';
   import Reacts from '@/components/Reacts.svelte';
-  import { reactsDict, selectedPost, selectedUserInfo, showModal, smileyDict } from '@/store';
+  import { reactsDict, reactsOfflineDict, selectedPost, selectedUserInfo, showModal, smileyDict } from '@/store';
   import { justAlert, sortReacts } from '@/utils';
 
   export let pid: number;
-  export let uid: number;
+  export let uid2: number;
 
   let reacts: Reaction[] = [];
+  let reactsOffline: ReactionOffline[] = [];
 
-  $: {
+  $: if (!import.meta.env.VITE_OFFLINE) {
     const postReacts = $reactsDict[`pid${ pid }`];
     if (!postReacts) {
       reacts = [];
@@ -18,39 +19,55 @@
     }
   }
 
+  $: if (import.meta.env.VITE_OFFLINE) {
+    const postReacts = $reactsOfflineDict[`pid${ pid }`];
+    reactsOffline = postReacts || [];
+  }
+
   const onAddBtnClick = () => {
     $showModal = true;
     $selectedPost = {
       pid,
-      uid,
+      uid2,
     };
   };
 
   const onRemoveBtnClick = async () => {
+    if (import.meta.env.VITE_OFFLINE) {
+      reactApiOfflineUpdatePostReacts({ pid, uid2 }, null);
+      return;
+    }
     if (!$selectedUserInfo) {
       justAlert('请先选择账号');
       return;
     }
-    await reactApiUpdatePostReact({ pid, uid }, null, $selectedUserInfo);
+    await reactApiUpdatePostReact({ pid, uid2 }, null, $selectedUserInfo);
   };
 
   const onPlusBtnClick = async (smiley: string) => {
+    if (import.meta.env.VITE_OFFLINE) {
+      return;
+    }
     if (!$selectedUserInfo) {
       justAlert('请先选择账号');
       return;
     }
-    await reactApiUpdatePostReact({ pid, uid }, smiley, $selectedUserInfo);
+    await reactApiUpdatePostReact({ pid, uid2 }, smiley, $selectedUserInfo);
   };
 </script>
 
 <div class="post-reacts">
-  <Reacts {reacts}>
+  <Reacts {reacts} {reactsOffline}>
     <svelte:fragment let:react slot="actionButton">
-      {#if $selectedUserInfo}
-        {#if react.reacted}
-          <button class="action-btn remove-react-btn" on:click={onRemoveBtnClick}>×</button>
-        {:else}
-          <button class="action-btn plus-react-btn" on:click={() => {onPlusBtnClick(react.smiley)}}>+</button>
+      {#if import.meta.env.VITE_OFFLINE}
+        <button class="action-btn remove-react-btn" on:click={onRemoveBtnClick}>×</button>
+      {:else}
+        {#if $selectedUserInfo}
+          {#if react.reacted}
+            <button class="action-btn remove-react-btn" on:click={onRemoveBtnClick}>×</button>
+          {:else}
+            <button class="action-btn plus-react-btn" on:click={() => {onPlusBtnClick(react.smiley)}}>+</button>
+          {/if}
         {/if}
       {/if}
     </svelte:fragment>

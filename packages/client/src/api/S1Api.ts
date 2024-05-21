@@ -1,5 +1,5 @@
 import * as runtime from '@/api/gen/runtime';
-import SmilesModule from '@/smilesModule';
+import S1ApiOffline, { type Post200Response } from '@/api/S1ApiOffline';
 import { obj2form, randomInt } from 'shared';
 
 interface PostLoginOperationRequest {
@@ -17,12 +17,6 @@ interface PostLogoutOperationRequest {
   [key: string]: string | undefined;
 }
 
-interface Post200Response {
-  success: boolean;
-  code: number;
-  message: string;
-}
-
 export interface PostLogin200Response extends Post200Response {
   data: {
     uid: string;
@@ -34,11 +28,7 @@ export interface PostLogin200Response extends Post200Response {
 export interface PostLogout200Response extends Post200Response {
 }
 
-export interface GetSmiles200Response extends Post200Response {
-  data: SmilesData[];
-}
-
-export default class S1Api extends runtime.BaseAPI {
+export default class S1Api extends S1ApiOffline {
   async postLogin(requestParameters: PostLoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostLogin200Response> {
     if (import.meta.env.VITE_SKIP_S1) {
       const randomUID = randomInt(1000, 9999);
@@ -69,25 +59,6 @@ export default class S1Api extends runtime.BaseAPI {
     return await response.value();
   }
 
-  async getSmiles(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetSmiles200Response> {
-    if (import.meta.env.VITE_SKIP_S1) {
-      const json = await SmilesModule.getJSON();
-      for (const smiles of json) {
-        for (const smile of smiles.list) {
-          smile.url = await SmilesModule.replaceWithLocal(smile.url);
-        }
-      }
-      return {
-        success: true,
-        code: 200,
-        message: '',
-        data: json,
-      };
-    }
-    const response = await this.getSmilesRaw(initOverrides);
-    return await response.value();
-  }
-
   private async postLoginRaw(requestParameters: PostLoginOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostLogin200Response>> {
     const queryParameters: any = {};
     const headerParameters: runtime.HTTPHeaders = {};
@@ -115,20 +86,6 @@ export default class S1Api extends runtime.BaseAPI {
       headers: headerParameters,
       query: queryParameters,
       body: obj2form(requestParameters),
-    }, initOverrides);
-
-    return new runtime.JSONApiResponse(response);
-  }
-
-  private async getSmilesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetSmiles200Response>> {
-    const queryParameters: any = {};
-    const headerParameters: runtime.HTTPHeaders = {};
-
-    const response = await this.request({
-      path: '/post/smiles',
-      method: 'GET',
-      headers: headerParameters,
-      query: queryParameters,
     }, initOverrides);
 
     return new runtime.JSONApiResponse(response);

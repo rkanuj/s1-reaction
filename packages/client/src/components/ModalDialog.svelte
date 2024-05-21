@@ -32,7 +32,8 @@
 <dialog
     bind:this={dialog}
     class="modal-dialog"
-    class:only-login-form={$needLogin}
+    class:offline={!!import.meta.env.VITE_OFFLINE}
+    class:only-login-form={!import.meta.env.VITE_OFFLINE && $needLogin}
 >
   <div class="dialog-header">
     <div class="dialog-title">S1 Reaction</div>
@@ -73,6 +74,10 @@
       width: 500px;
       height: 80vh;
       max-height: 580px;
+    }
+
+    &.offline {
+      max-height: 350px
     }
 
     .dialog-header {

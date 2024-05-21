@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { authApi, s1Api } from '@/api';
   import type { PostGenerateToken200Response } from '@/api/gen';
+  import API from '@/api/index.js';
   import type { PostLogin200Response, PostLogout200Response } from '@/api/S1Api';
   import { needLogin, selectedUID, userInfoDict } from '@/store';
   import { justLogError } from '@/utils';
@@ -26,11 +26,15 @@
   };
 
   const loginAndGenerateToken = async () => {
+    if (import.meta.env.VITE_OFFLINE) {
+      return null;
+    }
+
     if (!username || !password) {
       return '用户名或密码不能为空';
     }
 
-    const loginResponse = await s1Api.postLogin(questionid && questionid !== '0' ? {
+    const loginResponse = await API.s1Api.postLogin(questionid && questionid !== '0' ? {
       username,
       password,
       questionid,
@@ -49,14 +53,14 @@
     username = loginResponse.data.username;
     exp = exp && exp > 0 ? exp : 0;
 
-    const generateTokenResponse = await authApi.postGenerateToken({
+    const generateTokenResponse = await API.authApi.postGenerateToken({
       postGenerateTokenRequest: {
         uid,
         sid,
         exp,
       },
     }).catch(responseErrorHandle<PostGenerateToken200Response>).finally(async () => {
-      const logoutResponse = await s1Api.postLogout({ sid }).catch(responseErrorHandle<PostLogout200Response>);
+      const logoutResponse = await API.s1Api.postLogout({ sid }).catch(responseErrorHandle<PostLogout200Response>);
       if (!logoutResponse.success) {
         justLogError(logoutResponse.message || 'S1 登出接口失败');
       }
@@ -81,6 +85,10 @@
   };
 
   const onLoginBtnClick = async () => {
+    if (import.meta.env.VITE_OFFLINE) {
+      return;
+    }
+
     const result = await loginAndGenerateToken();
     if (result !== null) {
       errorMessage = `账号登录失败：${ result }`;
@@ -92,38 +100,40 @@
   };
 </script>
 
-<div class="login">
-  {#if !needReLogin}
-    <button class="re-login-btn" on:click={() => {needReLogin = true}}>重新登录或登录新账号</button>
-  {:else}
-    {#if !$needLogin}
-      <button class="re-login-btn" on:click={() => {needReLogin = false; resetForm();}}>退出登录</button>
+{#if !import.meta.env.VITE_OFFLINE}
+  <div class="login">
+    {#if !needReLogin}
+      <button class="re-login-btn" on:click={() => {needReLogin = true}}>重新登录或登录新账号</button>
+    {:else}
+      {#if !$needLogin}
+        <button class="re-login-btn" on:click={() => {needReLogin = false; resetForm();}}>退出登录</button>
+      {/if}
+      <div class="login-form">
+        <input bind:value={username} name="username" placeholder="用户名" type="text"/>
+        <input bind:value={password} name="password" placeholder="密码" type="password"/>
+        <select bind:value={questionid} on:change={() => {answer = ''}}>
+          <option value="0">安全提问（未设置请忽略）</option>
+          <option value="1">母亲的名字</option>
+          <option value="2">爷爷的名字</option>
+          <option value="3">父亲出生的城市</option>
+          <option value="4">您其中一位老师的名字</option>
+          <option value="5">您个人计算机的型号</option>
+          <option value="6">您最喜欢的餐馆名称</option>
+          <option value="7">驾驶执照最后四位数字</option>
+        </select>
+        {#if questionid && questionid !== '0'}
+          <input bind:value={answer} placeholder="答案" type="text">
+        {/if}
+        <input bind:value={exp} min="0" placeholder="Token 有效时长" type="number"/>
+        <span class="tips">留空或 0 设为不过期（单位：秒）</span>
+        <button on:click={onLoginBtnClick}>登录</button>
+        {#if errorMessage}
+          <span class="error-message">{errorMessage}</span>
+        {/if}
+      </div>
     {/if}
-    <div class="login-form">
-      <input bind:value={username} name="username" placeholder="用户名" type="text"/>
-      <input bind:value={password} name="password" placeholder="密码" type="password"/>
-      <select bind:value={questionid} on:change={() => {answer = ''}}>
-        <option value="0">安全提问（未设置请忽略）</option>
-        <option value="1">母亲的名字</option>
-        <option value="2">爷爷的名字</option>
-        <option value="3">父亲出生的城市</option>
-        <option value="4">您其中一位老师的名字</option>
-        <option value="5">您个人计算机的型号</option>
-        <option value="6">您最喜欢的餐馆名称</option>
-        <option value="7">驾驶执照最后四位数字</option>
-      </select>
-      {#if questionid && questionid !== '0'}
-        <input bind:value={answer} placeholder="答案" type="text">
-      {/if}
-      <input bind:value={exp} min="0" placeholder="Token 有效时长" type="number"/>
-      <span class="tips">留空或 0 设为不过期（单位：秒）</span>
-      <button on:click={onLoginBtnClick}>登录</button>
-      {#if errorMessage}
-        <span class="error-message">{errorMessage}</span>
-      {/if}
-    </div>
-  {/if}
-</div>
+  </div>
+{/if}
 
 <style lang="scss">
   $form-width: 240px;
