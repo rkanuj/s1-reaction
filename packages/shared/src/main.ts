@@ -2,7 +2,7 @@ export function currentTimestamp(date = new Date()) {
   return Math.floor(date.getTime() / 1000);
 }
 
-export function formatTimestamp(timestamp: number, toLocal = false) {
+export function formatTimestamp(timestamp = currentTimestamp(), toLocal = false) {
   const date = new Date(timestamp * 1000);
   if (toLocal) {
     return date.toLocaleString();
