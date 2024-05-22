@@ -1,1 +1,5 @@
+在线版（需登录 S1 账号）：
 https://greasyfork.org/scripts/494721
+
+离线版（无需登录，本地使用）：
+https://greasyfork.org/scripts/495710

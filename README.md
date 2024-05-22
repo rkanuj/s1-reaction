@@ -9,8 +9,10 @@
 **为保证服务用量在可接受的范围内，需要用户通过脚本登录 S1 账号验证有效后才会提供数据写入功能（具体验证规则见下方用户验证）。
 服务保证不收集超出必要的用户信息，不过确实有接收账号敏感数据（Session ID）用于验证的步骤，介意的话可以不登录使用（只读）。**
 
-- 泥潭试运行发布帖：https://bbs.saraba1st.com/2b/thread-2184175-1-1.html
-- Greasy Fork 用户脚本发布地址：https://greasyfork.org/scripts/494721
+- 泥潭发布帖：https://bbs.saraba1st.com/2b/thread-2184175-1-1.html
+- Greasy Fork 用户脚本发布地址：
+  - 在线版：https://greasyfork.org/scripts/494721
+  - 离线版：https://greasyfork.org/scripts/495710
 
 ## 功能特性
 
